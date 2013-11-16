@@ -36,4 +36,4 @@ nosetests.xml
 .pydevproject
 
 # Django
-settings.py
+#settings.py
