@@ -7,4 +7,3 @@ djangorestframework==2.3.9
 postgres==2.1.1
 psycopg2==2.5.1
 wsgiref==0.1.2
-SUUUUUUP
