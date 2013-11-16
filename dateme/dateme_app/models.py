@@ -25,13 +25,14 @@ class ContentType(models.Model):
     def __unicode__(self):
         return self.name
 
-class Conversation(models.Model):
-    subscriber = models.ForeignKey(User)
+# class Conversation(models.Model):
+#     subscriber = models.(User)
 
 class Message(models.Model):
     contentType = models.ForeignKey(ContentType)
-    conversation = models.ForeignKey(Conversation)
-    sender = models.ForeignKey(User)
+    # conversation = models.ForeignKey(Conversation)
+    sender = models.ForeignKey(User, related_name='sender')
+    receiver = models.ForeignKey(User, related_name='receiver')
     timestamp = models.DateTimeField(auto_now = True)
     value = models.TextField()
 

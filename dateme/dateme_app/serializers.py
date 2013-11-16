@@ -41,14 +41,8 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         model = models.ContentType
         fields = ('id', 'name')
 
-class ConversationSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = models.Conversation
-        fields = ('id', 'subscriber')
-
 class MessageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.Message
-        fields = ('id', 'conversation', 'sender', 'timestamp', 'value', 'contentType')
+        fields = ('id', 'receiver', 'sender', 'timestamp', 'value', 'contentType')
