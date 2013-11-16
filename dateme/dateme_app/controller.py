@@ -5,6 +5,8 @@ from dateme_app.serializers import *
 
 def get_messages(user, lastTime, num_messages, status):
 
+    # TODO: should lastTime variable
+    
     status["success"] = False
     messages = models.Message.objects.filter(sender=user).order_by('timestamp')
     if num_messages:

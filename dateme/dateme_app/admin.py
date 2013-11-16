@@ -1,6 +1,9 @@
 from django.contrib import admin
+from dateme_app.models import *
 
-# Register your models here.
-from dateme_app.models import Test
+admin.site.register(Message)
+admin.site.register(ContentType)
+admin.site.register(Conversation)
+admin.site.register(Person)
+admin.site.register(Setting)
 
-admin.site.register(Test)

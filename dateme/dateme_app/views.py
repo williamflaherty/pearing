@@ -46,7 +46,7 @@ def get_messages(request):
                 num_messages = request.DATA["num_messages"]
             
             # request the last x messages from the last x time
-            retval = controller_patient.get_messages(user, last_time, num_messages, retval) 
+            retval = controller.get_messages(user, last_time, num_messages, retval) 
 
             # serialize the data back into JSON
             retval["data"]["messages"] = (MessageSerializer(retval["data"]["messages"])).data
