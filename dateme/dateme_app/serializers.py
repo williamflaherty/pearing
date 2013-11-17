@@ -33,7 +33,7 @@ class UserSerializer(DynamicFieldsModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'password', 'setting_set')
+        fields = ('id', 'username', 'password', 'setting_set')
     
 class ContentTypeSerializer(serializers.ModelSerializer):
     
