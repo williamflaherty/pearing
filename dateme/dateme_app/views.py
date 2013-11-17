@@ -77,6 +77,7 @@ def add_message(request):
         else:
             retval["error"] = message.errors
     return JSONResponse(retval, status=200)
+
 @csrf_exempt
 @api_view(['POST'])
 def save_fields(request):
@@ -121,3 +122,29 @@ def get_fields(request):
                 retval = controller.save_fields(user, person, status)
         
     return JSONResponse(retval, status=200)
+
+@csrf_exempt
+@api_view(['POST'])
+def complete_challenge(request):
+    retval = {
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
+    }
+
+    if request.method == 'POST':
+        # TODO: authenticate the user via the token
+        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+
+        challenge = ChallengeSerializer(data=request.DATA["challenge"])
+        challenge_valid = challenge.is_valid()
+
+        if challenge_valid:
+            challenge = challenge.object
+            retval = controller.complete_challenge(user, challenge, retval) 
+        else:
+            retval["error"] = challenge.errors
+    return JSONResponse(retval, status=200)
+
+

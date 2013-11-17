@@ -26,19 +26,6 @@ class SettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Setting
         fields = ('name', 'value')
-		
-class PersonSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Person
-        fields = ('id', 'user', 'isValidated', 'tagline')
-
-class UserSerializer(DynamicFieldsModelSerializer):
-    setting_set = SettingSerializer(many=True, required=False)
-    password = serializers.CharField(required=False)
-
-    class Meta:
-        model = User
-        fields = ('id', 'email', 'password', 'setting_set')
     
 class ContentTypeSerializer(serializers.ModelSerializer):
     
@@ -59,3 +46,11 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Message
         fields = ('id', 'conversation', 'sender', 'timestamp', 'value', 'contentType')
+
+class ChallengeSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.MessageChallenge
+        fields = ('id', 'challenge', 'message', 'picture', 'isComplete')
+
+

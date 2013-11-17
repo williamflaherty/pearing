@@ -58,6 +58,10 @@ class Challenge(models.Model):
     value = models.CharField(max_length = 255, unique = True)
     level = models.IntegerField()
 
+    def __unicode__(self):
+        return u'%s: %s' % (self.title, self.value)
+
+
 class Location(models.Model):
     user = models.ForeignKey(Person)
     latitude_degrees = models.IntegerField()
@@ -66,6 +70,18 @@ class Location(models.Model):
     longitude_minutes = models.DecimalField(max_digits = 19, decimal_places = 10)
     timestamp = models.DateTimeField()
 
+class MessageChallenge(models.Model):
+    # TODO: picture probably shouldn't be a text field
+    challenge = models.ForeignKey(Challenge)
+    message = models.ForeignKey(Message)
+    picture = models.TextField(blank = True)
+    isComplete = models.BooleanField()
+
+    class Meta:
+        unique_together = ('challenge', 'message')
+
+    def __unicode__(self):
+        return u'%s' % (self.message)
 
 
 
