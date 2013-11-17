@@ -1,4 +1,5 @@
-from datetime import date, datetime, time
+#from datetime import date, datetime, time
+import datetime
 from dateme_app import models
 from dateme_app.serializers import *
 import random
@@ -106,21 +107,24 @@ def complete_challenge(user, challenge, status):
 def match(user, status):
 
     status["success"] = False
-
-    people = models.Person.objects.all()
-    match_five = random.sample(people, 6)
-    for person in match_five:
-        if person == user:
-            match_five.remove(user)
-            status["data"]["people"] = match_five
-            print status
-            return status
-    match_five.remove(match_five[5])
-    #for i in range(5):
-    #    idx = random.randrange(0, people.count(), 1)
-    #    match_five[people[i].username] = people[idx]
-    status["data"]["people"] = match_five
+    
+    #calculate the birthdate ranges
+    old_date = datetime.date.today() - datetime.timedelta(days=user.age_end*365.24)
+    young_date = datetime.date.today() - datetime.timedelta(days=user.age_start*365.24)
+    
+    #filter out the user, the birthdate ranges, and orientation(not yet working)
+    people = models.Person.objects.exclude(username__iexact=user.username).exclude(birthday__gte=young_date).filter(birthday__gte=old_date)
+    #.filter(orientation__name=user.orientation) Orientation filtering not working yet.
+    print people
+    
+    #If 5 or more people match the user's criteria, pick 5 random people; else, just pull the people who actually fit criteria
+    if people.count() >= 5:
+        match_five = random.sample(people, 5)
+    else:
+        match_five = random.sample(people, people.count())
+        
+    #setup data for return to JSON
     status["success"] = True
+    status["data"]["people"] = match_five
     print status
-
     return status

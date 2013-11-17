@@ -143,6 +143,7 @@ def complete_challenge(request):
 @csrf_exempt
 @api_view(['POST'])
 def match(request):
+    #JSON to recieve: {"user":{"username":"<user-to-receive-matches>"}}
     retval = {
         "success": False, 
         "data": {}, 
@@ -152,9 +153,17 @@ def match(request):
 
     if request.method == 'POST':
         # TODO: authenticate the user via the token
-        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+        
+        #grab the username provided
+        username = request.DATA["user"]["username"]
+        
+        #get the given user's person data
+        user = models.Person.objects.get(username__iexact=username)
 
+        #call match function
         retval = controller.match(user, retval) 
+        
+        #serialize data from the match function to be converted to JSON and handed back to app
         retval["data"]["people"] = (PersonSerializer(retval["data"]["people"])).data
     return JSONResponse(retval, status=200)
 
