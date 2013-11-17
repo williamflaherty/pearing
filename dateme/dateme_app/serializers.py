@@ -26,14 +26,6 @@ class SettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Setting
         fields = ('name', 'value')
-
-class UserSerializer(DynamicFieldsModelSerializer):
-    setting_set = SettingSerializer(many=True, required=False)
-    password = serializers.CharField(required=False)
-
-    class Meta:
-        model = User
-        fields = ('id', 'email', 'password', 'setting_set')
     
 class ContentTypeSerializer(serializers.ModelSerializer):
     
