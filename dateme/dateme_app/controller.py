@@ -47,3 +47,29 @@ def add_message(user, message, status):
     status["success"] = True
 
     return status
+def save_fields(user, Person, status):
+	
+	status["success"] = False
+	
+	# update the person object in the database
+	m = models.Person.objects.get(user)
+	Person.pk = m.pk
+	
+	# save person object to the database
+	Person.save()
+	
+	# set success
+    status["success"] = True
+
+	return status
+	
+def get_fields(user, status):
+
+	# get current person object from database
+	m = models.Person.objects.get(user)
+	
+	# return person object and set success
+	status["data"]["Person"] = m
+	status["success"] = True
+
+	return status

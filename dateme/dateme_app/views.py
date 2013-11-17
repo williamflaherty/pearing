@@ -77,3 +77,47 @@ def add_message(request):
         else:
             retval["error"] = message.errors
     return JSONResponse(retval, status=200)
+@csrf_exempt
+@api_view(['POST'])
+def save_fields(request):
+	retval = {
+		"success": False
+	}
+	
+	if request.method == 'POST':
+		sender = UserSerializer(data=request.DATA["user"])
+        valid = sender.is_valid()
+		
+		if valid:
+			user = authenticate(username=sender.object.email, password=sender.object.password)
+			
+			person = PersonSerializer(data=request.DATA["Person"])
+			person_valid = person.is_valid()
+			
+			if person_valid:
+				retval = controller.save_fields(user, person, status)
+	
+	return JSONResponse(retval, status=200)
+	
+@csrf_exempt
+@api_view(['POST'])
+def get_fields(request):
+	retval = {
+		"success": False
+	}
+	
+	if request.method == 'POST':
+		sender = UserSerializer(data=request.DATA["user"])
+		
+        valid = sender.is_valid()
+		
+		if valid:
+			user = authenticate(username=sender.object.email, password=sender.object.password)
+			
+			person = PersonSerializer(data=request.DATA["Person"])
+			person_valid = person.is_valid()
+			
+			if person_valid:
+				retval = controller.save_fields(user, person, status)
+		
+	return JSONResponse(retval, status=200)
