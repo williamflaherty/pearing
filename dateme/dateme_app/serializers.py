@@ -46,8 +46,16 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         model = models.ContentType
         fields = ('id', 'name')
 
+class PersonSerializer(serializers.ModelSerializer):
+    
+    # TODO: include settings
+
+    class Meta:
+        model = models.Person
+        fields = ('id', 'username', 'handle', 'token', 'tagline', 'birthday', 'age_start', 'age_end', 'gender', 'orientation')
+
 class MessageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.Message
-        fields = ('id', 'receiver', 'sender', 'timestamp', 'value', 'contentType')
+        fields = ('id', 'conversation', 'sender', 'timestamp', 'value', 'contentType')

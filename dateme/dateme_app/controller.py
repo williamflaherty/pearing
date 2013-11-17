@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from datetime import date, datetime, time
 from dateme_app import models
 from dateme_app.serializers import *
@@ -29,17 +28,11 @@ def add_message(user, message, status):
         contentType = models.ContentType.objects.get(pk=message.contentType.id),
         sender = user,
         value = message.value,
-        #receiver = models.Person.objects.get(user__pk=message.receiver.id)
-        #receiver = models.Person.objects.get(pk=1)
-        receiver = models.User.objects.get(pk=2)
+        conversation = message.Conversation.objects.get(pk=message.conversation.id)
     )
     
     # save message object to the database
     m.save()
-
-    # TODO: how to know if save was successful?
-    #   if m.pk maybe?
-    #   or a try/catch?
 
     # assume it works and return success and the data we just saved
     # it probably doesn't need to return the data we saved as it is just overhead...

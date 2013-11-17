@@ -2,6 +2,9 @@ from django.db import models
 
 class Gender(models.Model):
     name = models.CharField(max_length = 20, unique = True)
+    
+    def __unicode__(self):
+        return self.name
 
 # TODO: do we need registration statuses?
 class Person(models.Model):
@@ -16,7 +19,7 @@ class Person(models.Model):
     orientation = models.ManyToManyField(Gender, related_name='orientation')
 
     def __unicode__(self):
-        return self.user.username
+        return self.username
 
 class Setting(models.Model):
     user = models.ForeignKey(Person) 
@@ -42,7 +45,7 @@ class Conversation(models.Model):
 class Message(models.Model):
     contentType = models.ForeignKey(ContentType)
     conversation = models.ForeignKey(Conversation)
-    sender = models.ForeignKey(User, related_name='sender')
+    sender = models.ForeignKey(Person)
     # receiver = models.ForeignKey(User, related_name='receiver')
     timestamp = models.DateTimeField(auto_now = True)
     value = models.TextField()
@@ -54,6 +57,14 @@ class Challenge(models.Model):
     title = models.CharField(max_length = 100, unique = True)
     value = models.CharField(max_length = 255, unique = True)
     level = models.IntegerField()
+
+class Location(models.Model):
+    user = models.ForeignKey(Person)
+    latitude_degrees = models.IntegerField()
+    latitude_minutes = models.DecimalField(max_digits = 19, decimal_places = 10)
+    longitude_degrees = models.IntegerField()
+    longitude_minutes = models.DecimalField(max_digits = 19, decimal_places = 10)
+    timestamp = models.DateTimeField()
 
 
 

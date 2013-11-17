@@ -27,10 +27,9 @@ def get_messages(request):
     }
 
     if request.method == 'POST':
-    	# authenticate the user
-        # user = authenticate(username=sender.object.username, password=sender.object.password)
-        user = authenticate(username=request.DATA["user"]["username"], password=request.DATA["user"]["password"])
-         
+    	# TODO: authenticate the user via the token
+        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+
         # these are used for polling and limiting the number of messages, and are optional
         num_messages = None		# all messages
         last_time = 0			# from the beginning of time
@@ -62,8 +61,9 @@ def add_message(request):
     }
 
     if request.method == 'POST':
-        user = authenticate(username=request.DATA["user"]["username"], password=request.DATA["user"]["password"])
-        #request.DATA["message"]["sender"] = user.pk
+        # TODO: authenticate the user via the token
+        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+
         message = MessageSerializer(data=request.DATA["message"])
         message_valid = message.is_valid()
 
