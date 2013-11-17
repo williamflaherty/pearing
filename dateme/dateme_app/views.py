@@ -155,6 +155,7 @@ def match(request):
         user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
 
         retval = controller.match(user, retval) 
+        retval["data"]["people"] = (PersonSerializer(retval["data"]["people"])).data
     return JSONResponse(retval, status=200)
 
 

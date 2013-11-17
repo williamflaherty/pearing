@@ -108,10 +108,17 @@ def match(user, status):
     status["success"] = False
 
     people = models.Person.objects.all()
-    match_five = {}
-    for i in range(5):
-        idx = random.randrange(0, people.count(), 1)
-        match_five[people[i].username] = people[idx]
+    match_five = random.sample(people, 6)
+    for person in match_five:
+        if person == user:
+            match_five.remove(user)
+            status["data"]["people"] = match_five
+            print status
+            return status
+    match_five.remove(match_five[5])
+    #for i in range(5):
+    #    idx = random.randrange(0, people.count(), 1)
+    #    match_five[people[i].username] = people[idx]
     status["data"]["people"] = match_five
     status["success"] = True
     print status
