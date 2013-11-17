@@ -9,6 +9,7 @@ def get_messages(user, lastTime, num_messages, status):
     
     status["success"] = False
     messages = models.Message.objects.filter(sender=user).order_by('timestamp')
+    
     if num_messages:
         messages = messages[:num_messages]
     status["data"]["messages"] = messages
@@ -28,7 +29,9 @@ def add_message(user, message, status):
         contentType = models.ContentType.objects.get(pk=message.contentType.id),
         sender = user,
         value = message.value,
-        conversation = models.Conversation.objects.get(pk=message.conversation.id)
+        #receiver = models.Person.objects.get(user__pk=message.receiver.id)
+        #receiver = models.Person.objects.get(pk=1)
+        receiver = models.User.objects.get(pk=2)
     )
     
     # save message object to the database

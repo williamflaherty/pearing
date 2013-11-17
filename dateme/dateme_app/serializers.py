@@ -26,7 +26,7 @@ class SettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Setting
         fields = ('name', 'value')
-    
+  
 class ContentTypeSerializer(serializers.ModelSerializer):
     
     class Meta:
