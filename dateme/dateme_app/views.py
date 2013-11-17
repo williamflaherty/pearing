@@ -27,12 +27,12 @@ def get_messages(request):
     }
 
     if request.method == 'POST':
-    	# TODO: authenticate the user via the token
+        # TODO: authenticate the user via the token
         user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
 
         # these are used for polling and limiting the number of messages, and are optional
-        num_messages = None		# all messages
-        last_time = 0			# from the beginning of time
+        num_messages = None     # all messages
+        last_time = 0           # from the beginning of time
 
         if "last_time" in request.DATA:
             last_time = request.DATA["last_time"]
@@ -80,44 +80,44 @@ def add_message(request):
 @csrf_exempt
 @api_view(['POST'])
 def save_fields(request):
-	retval = {
-		"success": False
-	}
-	
-	if request.method == 'POST':
-		sender = UserSerializer(data=request.DATA["user"])
+    retval = {
+        "success": False
+    }
+    
+    if request.method == 'POST':
+        sender = UserSerializer(data=request.DATA["user"])
         valid = sender.is_valid()
-		
-		if valid:
-			user = authenticate(username=sender.object.email, password=sender.object.password)
-			
-			person = PersonSerializer(data=request.DATA["Person"])
-			person_valid = person.is_valid()
-			
-			if person_valid:
-				retval = controller.save_fields(user, person, status)
-	
-	return JSONResponse(retval, status=200)
-	
+        
+        if valid:
+            user = authenticate(username=sender.object.email, password=sender.object.password)
+            
+            person = PersonSerializer(data=request.DATA["Person"])
+            person_valid = person.is_valid()
+            
+            if person_valid:
+                retval = controller.save_fields(user, person, status)
+    
+    return JSONResponse(retval, status=200)
+    
 @csrf_exempt
 @api_view(['POST'])
 def get_fields(request):
-	retval = {
-		"success": False
-	}
-	
-	if request.method == 'POST':
-		sender = UserSerializer(data=request.DATA["user"])
-		
+    retval = {
+        "success": False
+    }
+    
+    if request.method == 'POST':
+        sender = UserSerializer(data=request.DATA["user"])
+        
         valid = sender.is_valid()
-		
-		if valid:
-			user = authenticate(username=sender.object.email, password=sender.object.password)
-			
-			person = PersonSerializer(data=request.DATA["Person"])
-			person_valid = person.is_valid()
-			
-			if person_valid:
-				retval = controller.save_fields(user, person, status)
-		
-	return JSONResponse(retval, status=200)
+        
+        if valid:
+            user = authenticate(username=sender.object.email, password=sender.object.password)
+            
+            person = PersonSerializer(data=request.DATA["Person"])
+            person_valid = person.is_valid()
+            
+            if person_valid:
+                retval = controller.save_fields(user, person, status)
+        
+    return JSONResponse(retval, status=200)
