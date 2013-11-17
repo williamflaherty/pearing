@@ -61,12 +61,12 @@ def add_message(user, message, status):
 
     return status
 
-def save_fields(user, person, status):
+def save_person(user, person, status):
     
     status["success"] = False
     
     # update the person object in the database
-    m = models.Person.objects.get(user)
+    m = models.Person.objects.get(username=user)
     person.pk = m.pk
     
     # save person object to the database
@@ -77,13 +77,15 @@ def save_fields(user, person, status):
 
     return status
     
-def get_fields(user, status):
+def get_person(user, status):
+
+    status["success"] = False
 
     # get current person object from database
-    m = models.Person.objects.get(user)
+    m = models.Person.objects.get(username=user)
     
     # return person object and set success
-    status["data"]["Person"] = m
+    status["data"]["person"] = m
     status["success"] = True
 
     return status

@@ -8,8 +8,8 @@ class Gender(models.Model):
 
 # TODO: do we need registration statuses?
 class Person(models.Model):
-    username = models.CharField(max_length = 100, unique = True)
-    handle = models.CharField(max_length = 35, unique = True)
+    username = models.CharField(max_length = 100)
+    handle = models.CharField(max_length = 35)
     token = models.CharField(max_length = 200)
     tagline = models.CharField(max_length = 300, blank = True)
     birthday = models.DateTimeField()

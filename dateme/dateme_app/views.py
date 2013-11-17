@@ -80,46 +80,39 @@ def add_message(request):
 
 @csrf_exempt
 @api_view(['POST'])
-def save_fields(request):
+def save_person(request):
     retval = {
-        "success": False
+        "success": False,
+        "error": ""
     }
     
     if request.method == 'POST':
-        sender = UserSerializer(data=request.DATA["user"])
-        valid = sender.is_valid()
+        user = models.Person.objects.get(username = request.DATA["user"]["username"])
         
-        if valid:
-            user = authenticate(username=sender.object.email, password=sender.object.password)
-            
-            person = PersonSerializer(data=request.DATA["Person"])
-            person_valid = person.is_valid()
-            
-            if person_valid:
-                retval = controller.save_fields(user, person, status)
-    
+        person = PersonSerializer(data=request.DATA["person"])
+        
+        person_valid = person.is_valid()
+
+        if person_valid:
+            retval = controller.save_person(user, person, retval)
+        else:
+            retval["error"] = person.errors
+
     return JSONResponse(retval, status=200)
     
 @csrf_exempt
 @api_view(['POST'])
-def get_fields(request):
+def get_person(request):
     retval = {
-        "success": False
+        "success": False,
+        "data": {}
     }
     
     if request.method == 'POST':
-        sender = UserSerializer(data=request.DATA["user"])
+        user = models.Person.objects.get(username = request.DATA["user"]["username"])
         
-        valid = sender.is_valid()
-        
-        if valid:
-            user = authenticate(username=sender.object.email, password=sender.object.password)
-            
-            person = PersonSerializer(data=request.DATA["Person"])
-            person_valid = person.is_valid()
-            
-            if person_valid:
-                retval = controller.save_fields(user, person, status)
+        retval = controller.get_person(user, retval)
+        retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
         
     return JSONResponse(retval, status=200)
 
