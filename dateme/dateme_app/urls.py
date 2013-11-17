@@ -8,4 +8,5 @@ urlpatterns = patterns('',
 	url(r'^save_person/$', views.save_person, name='save_person'),
 	url(r'^get_person/$', views.get_person, name='get_person'),
 	url(r'^complete_challenge/$', views.complete_challenge, name='complete_challenge'),
+    url(r'^match/$', views.match, name='match'),
 )

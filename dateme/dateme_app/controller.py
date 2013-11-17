@@ -1,6 +1,7 @@
 from datetime import date, datetime, time
 from dateme_app import models
 from dateme_app.serializers import *
+import random
 
 def get_messages(user, lastTime, num_messages, status):
 
@@ -99,5 +100,20 @@ def complete_challenge(user, challenge, status):
     challenge.isComplete = True
     challenge.save()
     status["success"] = True
+
+    return status
+    
+def match(user, status):
+
+    status["success"] = False
+
+    people = models.Person.objects.all()
+    match_five = {}
+    for i in range(5):
+        idx = random.randrange(0, people.count(), 1)
+        match_five[people[i].username] = people[idx]
+    status["data"]["people"] = match_five
+    status["success"] = True
+    print status
 
     return status

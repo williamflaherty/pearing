@@ -139,5 +139,22 @@ def complete_challenge(request):
         else:
             retval["error"] = challenge.errors
     return JSONResponse(retval, status=200)
+    
+@csrf_exempt
+@api_view(['POST'])
+def match(request):
+    retval = {
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
+    }
+
+    if request.method == 'POST':
+        # TODO: authenticate the user via the token
+        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+
+        retval = controller.match(user, retval) 
+    return JSONResponse(retval, status=200)
 
 

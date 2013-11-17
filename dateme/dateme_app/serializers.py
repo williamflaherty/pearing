@@ -54,3 +54,4 @@ class ChallengeSerializer(serializers.ModelSerializer):
         fields = ('id', 'challenge', 'message', 'picture', 'isComplete')
 
 
+
