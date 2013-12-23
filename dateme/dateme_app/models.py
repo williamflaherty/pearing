@@ -75,10 +75,12 @@ class MessageChallenge(models.Model):
     challenge = models.ForeignKey(Challenge)
     message = models.ForeignKey(Message)
     picture = models.TextField(blank = True)
+    user = models.ForeignKey(Person)
     isComplete = models.BooleanField()
 
-    class Meta:
-        unique_together = ('challenge', 'message')
+    # TODO: this should be included but I'm tired and having a hard time with the serializer
+    # class Meta:
+    #     unique_together = ('challenge', 'message')
 
     def __unicode__(self):
         return u'%s' % (self.message)

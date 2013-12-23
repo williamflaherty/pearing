@@ -51,7 +51,7 @@ class ChallengeSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = models.MessageChallenge
-        fields = ('id', 'challenge', 'message', 'picture', 'isComplete')
+        fields = ('id', 'challenge', 'message', 'picture', 'isComplete', 'user')
 
 
 

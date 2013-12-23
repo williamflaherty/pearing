@@ -96,10 +96,26 @@ def complete_challenge(user, challenge, status):
 
     status["success"] = False
 
-    mc = models.MessageChallenge.get(message__pk=challenge.message, challenge__pk=challenge.challenge.pk)
+    mc = models.MessageChallenge.objects.select_related('message__conversation').get(message__pk=challenge.message.pk, challenge__pk=challenge.challenge.pk, user=user)
     challenge.pk = mc.pk
     challenge.isComplete = True
     challenge.save()
+
+    # update the level they are authorized for if they have completed all the ones at a level
+    # TODO: this should only work if all sides have completed the challenge
+    level_up = True
+    conversation_id = mc.message.conversation.pk
+    mcs = models.MessageChallenge.objects.filter(message__conversation__pk=conversation_id).values_list('challenge__pk', flat=True).order_by('challenge__pk')
+    challenges = models.Challenge.objects.filter(level=mc.message.conversation.level)
+    for challenge in challenges:
+        if challenge.pk not in mcs:
+            level_up = False
+
+    if level_up:
+        conversation = models.Conversation.objects.get(pk=conversation_id)
+        conversation.level += 1
+        conversation.save()
+
     status["success"] = True
 
     return status
