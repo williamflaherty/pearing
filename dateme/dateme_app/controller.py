@@ -4,6 +4,20 @@ from dateme_app import models
 from dateme_app.serializers import *
 import random
 
+# shamelessly stolen from http://stackoverflow.com/questions/2217488/age-from-birthdate-in-python/2259711#2259711
+def calculate_age(born):
+    born = born.date()
+    today = datetime.date.today()
+    try: 
+        birthday = born.replace(year=today.year)
+    except ValueError: # raised when birth date is February 29 and the current year is not a leap year
+        birthday = born.replace(year=today.year, day=born.day-1)
+    if birthday > today:
+        return today.year - born.year - 1
+    else:
+        return today.year - born.year
+
+
 def get_messages(user, lastTime, num_messages, status):
 
     # TODO: should lastTime variable
@@ -127,17 +141,21 @@ def match(user, status):
     #calculate the birthdate ranges
     old_date = datetime.date.today() - datetime.timedelta(days=user.age_end*365.24)
     young_date = datetime.date.today() - datetime.timedelta(days=user.age_start*365.24)
-    
-    #filter out the user, the birthdate ranges, and orientation(not yet working)
-    people = models.Person.objects.exclude(username__iexact=user.username).exclude(birthday__gte=young_date).filter(birthday__gte=old_date)
-    #.filter(orientation__name=user.orientation) Orientation filtering not working yet.
-    print people
+    your_age = calculate_age(user.birthday)
+
+    # Retrieve users fitting criteria:
+    # Exclude yourself
+    people = models.Person.objects.exclude(username__iexact=user.username)
+    # Exclude users who are too young or too old
+    people = people.exclude(birthday__lte=old_date).exclude(birthday__gte=young_date)
+    # Exclude users who think YOU are too young or too old
+    people = people.exclude(age_start__gte=your_age).exclude(age_end__lte=your_age)
+    # Get users with appropriate orientation
+    people = people.filter(orientation__name__contains=user.gender.name).filter(gender__in=user.orientation.all())
     
     #If 5 or more people match the user's criteria, pick 5 random people; else, just pull the people who actually fit criteria
-    if people.count() >= 5:
-        match_five = random.sample(people, 5)
-    else:
-        match_five = random.sample(people, people.count())
+    match_five = random.sample(people, min(5, people.count()))
+    print match_five
         
     #setup data for return to JSON
     status["success"] = True
