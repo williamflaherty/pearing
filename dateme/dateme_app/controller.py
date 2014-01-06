@@ -162,3 +162,34 @@ def match(user, status):
     status["data"]["people"] = match_five
     print status
     return status
+
+def get_photos(user, status):
+    
+    status["success"] = False
+
+    # retrieve photos from user
+    # this should probably be ordered by time
+    photos = models.PhotoLink.objects.filter(user=user)
+    # photos = models.PhotoLink.objects.filter(user=user).order_by('timestamp')
+    
+    status["data"]["photos"] = photos
+    status["success"] = True
+
+    return status
+
+def set_photos(user, photos, status):
+    
+    status["success"] = False
+    
+    # update the photo object in the database
+    # I can't figure out how to update multiple objects, so we'll just delete them for now
+    # and then save the new photos
+    m = models.PhotoLink.objects.filter(user=user).delete()
+    
+    # save photo object to the database
+    photos.save()
+    
+    # set success
+    status["success"] = True
+
+    return status

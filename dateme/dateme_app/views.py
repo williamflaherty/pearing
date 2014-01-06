@@ -167,4 +167,49 @@ def match(request):
         retval["data"]["people"] = (PersonSerializer(retval["data"]["people"])).data
     return JSONResponse(retval, status=200)
 
+@csrf_exempt
+@api_view(['POST'])
+def get_photos(request):
+    #JSON to recieve: {"user":{"username":"<user-to-receive-photos>"}}
+    retval = {
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
+    }
 
+    if request.method == 'POST':
+        # TODO: authenticate the user via the token
+        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+        
+        # request photo urls from user
+        retval = controller.get_photos(user, retval) 
+
+        # serialize the data back into JSON
+        retval["data"]["photos"] = (PhotoSerializer(retval["data"]["photos"])).data
+
+    # return data to Willard
+    return JSONResponse(retval, status=200)
+
+@csrf_exempt
+@api_view(['POST'])
+def set_photos(request):
+    #JSON example: {"user":{"username":"doodman"}, "photos": [{"id": 1, "url": "http:\\\\i.imgur.com\\ZVfsM4A.jpg", "user": 1}, {"id": 2, "url": "http:\\\\i.imgur.com\\4K61Z1S.jpg", "user": 1}]}
+    retval = {
+        "success": False,
+        "error": ""
+    }
+    
+    if request.method == 'POST':
+        user = models.Person.objects.get(username = request.DATA["user"]["username"])
+        
+        photos = PhotoSerializer(data=request.DATA["photos"])
+        
+        photos_valid = photos.is_valid()
+
+        if photos_valid:
+            retval = controller.set_photos(user, photos, retval)
+        else:
+            retval["error"] = photos.errors
+
+    return JSONResponse(retval, status=200)

@@ -85,9 +85,12 @@ class MessageChallenge(models.Model):
     def __unicode__(self):
         return u'%s' % (self.message)
 
+class PhotoLink(models.Model):
+    url = models.CharField(max_length = 128)
+    user = models.ForeignKey(Person)
 
+    # TODO: timestamp probably needed
+    #timestamp = models.DateTimeField()
 
-
-
-
-
+    def __unicode__(self):
+        return self.url

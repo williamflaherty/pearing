@@ -53,5 +53,11 @@ class ChallengeSerializer(serializers.ModelSerializer):
         model = models.MessageChallenge
         fields = ('id', 'challenge', 'message', 'picture', 'isComplete', 'user')
 
+class PhotoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.PhotoLink
+        fields = ('id', 'url', 'user')
+        #fields = ('id', 'url', 'user', 'timestamp')
 
 
