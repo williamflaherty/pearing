@@ -64,10 +64,8 @@ class Challenge(models.Model):
 
 class Location(models.Model):
     user = models.ForeignKey(Person)
-    latitude_degrees = models.IntegerField()
-    latitude_minutes = models.DecimalField(max_digits = 19, decimal_places = 10)
-    longitude_degrees = models.IntegerField()
-    longitude_minutes = models.DecimalField(max_digits = 19, decimal_places = 10)
+    latitude = models.DecimalField(max_digits = 13, decimal_places = 10)
+    longitude = models.DecimalField(max_digits = 13, decimal_places = 10)
     timestamp = models.DateTimeField()
 
 class MessageChallenge(models.Model):

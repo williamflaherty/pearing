@@ -81,6 +81,7 @@ def add_message(request):
 @csrf_exempt
 @api_view(['POST'])
 def save_person(request):
+    #JSON example: {"user":{"username":"dcash"}, "person": {"id": 1, "username": "dcash", "handle": "dan", "token": "fake_token", "tagline": "cool guy", "birthday": "1990-06-11T21:44:12Z", "age_start": 20, "age_end": 50, "gender": 1, "orientation": [2]}}
     retval = {
         "success": False,
         "error": ""
@@ -94,6 +95,7 @@ def save_person(request):
         person_valid = person.is_valid()
 
         if person_valid:
+            person = person.object
             retval = controller.save_person(user, person, retval)
         else:
             retval["error"] = person.errors
@@ -211,5 +213,53 @@ def set_photos(request):
             retval = controller.set_photos(user, photos, retval)
         else:
             retval["error"] = photos.errors
+
+    return JSONResponse(retval, status=200)
+
+@csrf_exempt
+@api_view(['POST'])
+def get_location(request):
+    #JSON to recieve: {"user":{"username":"<user-to-retrieve-location-of>"}}
+    retval = {
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
+    }
+
+    if request.method == 'POST':
+        # TODO: authenticate the user via the token
+        user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
+        
+        # request location from user
+        retval = controller.get_location(user, retval) 
+
+        # serialize the data back into JSON
+        retval["data"]["location"] = (LocationSerializer(retval["data"]["location"])).data
+
+    # return data to Willard
+    return JSONResponse(retval, status=200)
+
+@csrf_exempt
+@api_view(['POST'])
+def set_location(request):
+    #JSON example: {"user":{"username":"doodman"}, "location":{"user": 2, "latitude": "147.1489341", "longitude": "85.189034", "timestamp": "2014-01-08T21:55:31Z"}}
+    retval = {
+        "success": False,
+        "error": ""
+    }
+    
+    if request.method == 'POST':
+        user = models.Person.objects.get(username = request.DATA["user"]["username"])
+        
+        location = LocationSerializer(data=request.DATA["location"])
+        
+        location_valid = location.is_valid()
+
+        if location_valid:
+            location = location.object
+            retval = controller.set_location(user, location, retval)
+        else:
+            retval["error"] = location.errors
 
     return JSONResponse(retval, status=200)

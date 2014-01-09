@@ -143,6 +143,14 @@ def match(user, status):
     young_date = datetime.date.today() - datetime.timedelta(days=user.age_start*365.24)
     your_age = calculate_age(user.birthday)
 
+    #calculate max and min lat/lon that we're willing to search for
+    # 1 degree of lat/lon is ~70 miles
+    loc = models.Location.objects.get(user=user)
+    min_lat = loc.latitude - 1
+    max_lat = loc.latitude + 1
+    min_lon = loc.longitude - 1
+    max_lon = loc.longitude + 1
+
     # Retrieve users fitting criteria:
     # Exclude yourself
     people = models.Person.objects.exclude(username__iexact=user.username)
@@ -152,6 +160,8 @@ def match(user, status):
     people = people.exclude(age_start__gte=your_age).exclude(age_end__lte=your_age)
     # Get users with appropriate orientation
     people = people.filter(orientation__name__contains=user.gender.name).filter(gender__in=user.orientation.all())
+    # Get users within 1 degree of latitude/longitude
+    people = people.filter(location__latitude__gt=min_lat, location__latitude__lt=max_lat, location__longitude__gt=min_lon, location__longitude__lt=max_lon)
     
     #If 5 or more people match the user's criteria, pick 5 random people; else, just pull the people who actually fit criteria
     match_five = random.sample(people, min(5, people.count()))
@@ -189,6 +199,34 @@ def set_photos(user, photos, status):
     # save photo object to the database
     photos.save()
     
+    # set success
+    status["success"] = True
+
+    return status
+
+def get_location(user, status):
+    
+    status["success"] = False
+
+    # retrieve last location from user
+    location = models.Location.objects.filter(user=user)
+    
+    status["data"]["location"] = location
+    status["success"] = True
+
+    return status
+
+def set_location(user, location, status):
+    
+    status["success"] = False
+    
+    # update the location object in the database or create new entry
+    m, created = models.Location.objects.get_or_create(user=user, defaults={'latitude':location.latitude,'longitude':location.longitude,'timestamp':location.timestamp})
+    
+    if not created:
+        location.pk = m.pk
+        location.save()
+
     # set success
     status["success"] = True
 

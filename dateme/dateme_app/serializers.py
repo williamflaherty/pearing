@@ -60,4 +60,9 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('id', 'url', 'user')
         #fields = ('id', 'url', 'user', 'timestamp')
 
+class LocationSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Location
+        fields = ('id', 'user', 'latitude', 'longitude', 'timestamp')
 

@@ -11,4 +11,6 @@ urlpatterns = patterns('',
     url(r'^match/$', views.match, name='match'),
     url(r'^get_photos/$', views.get_photos, name='get_photos'),
     url(r'^set_photos/$', views.set_photos, name='set_photos'),
+    url(r'^get_location/$', views.get_location, name='get_location'),
+    url(r'^set_location/$', views.set_location, name='set_location'),
 )
