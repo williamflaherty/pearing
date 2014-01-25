@@ -15,6 +15,31 @@ class JSONResponse(HttpResponse):
         kwargs['content_type'] = 'application/json'
         super(JSONResponse, self).__init__(content, **kwargs)
 
+# TODO: fix so it doesn't have to be csrf exempt
+@csrf_exempt
+def login(request):
+    
+    # This is an internal method only
+    retval = {
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
+    }
+
+    if "user" in request.DATA and "app" in request.DATA:
+
+	if "username" in request.DATA["user"] and "token" in request.DATA["user"] and "key" in request.DATA["app"]:
+
+	    # TODO: use person serializer with required fields
+            username = request.DATA["user"]["username"]
+	    token = request.DATA["user"]["token"]
+	    secret_key = request.DATA["app"]["key"]
+
+            if secret_key == "qahLbKqZG79E4N9XJV9nfdsj":
+                retval = controller.authenticate_user(username, token, retval) 
+
+    return retval
 
 @csrf_exempt
 @api_view(['POST'])
@@ -106,16 +131,22 @@ def save_person(request):
 @api_view(['POST'])
 def get_person(request):
     retval = {
-        "success": False,
-        "data": {}
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
     }
     
+    # TODO: clean up login/controller/this method, and include better error handling
     if request.method == 'POST':
-        user = models.Person.objects.get(username = request.DATA["user"]["username"])
+	is_auth = login(request)
+	if is_auth["success"]:
+            username = request.DATA["user"]["username"]
         
-        retval = controller.get_person(user, retval)
-        retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
-        
+            retval = controller.get_person(username, retval)
+            retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
+        else:
+            return JSONResponse(retval, status=403)
     return JSONResponse(retval, status=200)
 
 @csrf_exempt

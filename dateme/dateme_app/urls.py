@@ -13,4 +13,5 @@ urlpatterns = patterns('',
     url(r'^set_photos/$', views.set_photos, name='set_photos'),
     url(r'^get_location/$', views.get_location, name='get_location'),
     url(r'^set_location/$', views.set_location, name='set_location'),
+    url(r'^login/$', views.login, name='login'),
 )

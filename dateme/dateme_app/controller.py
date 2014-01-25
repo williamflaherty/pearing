@@ -2,6 +2,7 @@
 import datetime
 from dateme_app import models
 from dateme_app.serializers import *
+from django.utils import timezone
 import random
 
 # shamelessly stolen from http://stackoverflow.com/questions/2217488/age-from-birthdate-in-python/2259711#2259711
@@ -103,6 +104,26 @@ def get_person(user, status):
     # return person object and set success
     status["data"]["person"] = m
     status["success"] = True
+
+    return status
+
+def authenticate_user(user, token, status):
+    status["success"] = False
+
+    # TODO: provide way to save token into db
+    m = models.Person.objects.filter(username=user)
+    if len(m) == 1:
+        m = m[0]
+        if m.token == token and m.token_expiration >= timezone.now():
+            status["success"] = True
+        elif m.token == token:
+	    # TODO: this prolly won't be in this method, but for now, if token expired, reauth with instagram
+	    pass
+	    #https://api.instagram.com/v1/users/13863795?access_token=13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f
+    elif m:
+        pass
+    else:
+        pass
 
     return status
 

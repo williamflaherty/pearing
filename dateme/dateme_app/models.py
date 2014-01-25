@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
 class Gender(models.Model):
     name = models.CharField(max_length = 20, unique = True)
@@ -11,12 +15,14 @@ class Person(models.Model):
     username = models.CharField(max_length = 100)
     handle = models.CharField(max_length = 35)
     token = models.CharField(max_length = 200)
+    token_expiration = models.DateTimeField()
     tagline = models.CharField(max_length = 300, blank = True)
     birthday = models.DateTimeField()
     age_start = models.IntegerField()
     age_end = models.IntegerField()
     gender = models.ForeignKey(Gender, related_name='gender')
     orientation = models.ManyToManyField(Gender, related_name='orientation')
+    age = models.IntegerField()
 
     def __unicode__(self):
         return self.username
