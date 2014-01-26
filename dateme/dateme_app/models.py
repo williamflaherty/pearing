@@ -17,13 +17,14 @@ class Person(models.Model):
     token = models.CharField(max_length = 200)
     token_expiration = models.DateTimeField()
     tagline = models.CharField(max_length = 300, blank = True)
-    birthday = models.DateTimeField()
+    birthday = models.DateField()
     age_start = models.IntegerField()
     age_end = models.IntegerField()
     gender = models.ForeignKey(Gender, related_name='gender')
-    orientation = models.ManyToManyField(Gender, related_name='orientation')
+    orientation = models.ForeignKey(Gender, related_name='orientation')
+    # orientation = models.ManyToManyField(Gender, related_name='orientation')
     age = models.IntegerField()
-
+    # TODO: add bisexuality back in later
     def __unicode__(self):
         return self.username
 

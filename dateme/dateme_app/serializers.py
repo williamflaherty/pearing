@@ -39,7 +39,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Person
-        fields = ('id', 'username', 'handle', 'token', 'tagline', 'birthday', 'age_start', 'age_end', 'gender', 'orientation')
+        fields = ('id', 'username', 'handle', 'token', 'tagline', 'birthday', 'age_start', 'age_end', 'gender', 'orientation', 'age')
 
 class MessageSerializer(serializers.ModelSerializer):
     

@@ -20,6 +20,7 @@ class JSONResponse(HttpResponse):
 def login(request):
     
     # This is an internal method only
+    # TODO: clean up
     retval = {
         "success": False, 
         "data": {}, 
@@ -39,7 +40,7 @@ def login(request):
             if secret_key == "qahLbKqZG79E4N9XJV9nfdsj":
                 retval = controller.authenticate_user(username, token, retval) 
 
-    return retval
+    return retval["success"]
 
 @csrf_exempt
 @api_view(['POST'])
@@ -110,32 +111,34 @@ def register_person(request):
     # register a new person, their username can't already be in the db
     # MSB: yes I know username and token are in here twice, I'll fix that later
     #      username and token should match in both dicts, but not enforced
+    # MSB: and I say things are optional, but they aren't really right now. sorry.
+    # MSB: I can change it so you don't have to pass in pk for things like orientation, just let me know
     # { "app": 
     #       {
     #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
-    #       }
+    #       },
     #   "user":
     #       {
     #           "username": "mischa",
     #           "token": "bloop"
-    #       }
+    #       },
     #   "person":
-    #       {
-    #       // required
+    #       {   // required
     #           "username": "mischa",
     #           "token": "bloop",
-    #           handle = "mischa",
-    #           birthday = "1991-10-09",
-    #           age_start = "20",
-    #           age_end = "25",
-    #           gender = "Female",
-    #           orientation = ["Male"],
-    #           age = "22",
-    #       // optional
-    #           tagline = "Hi.",
+    #           "handle": "mischa",
+    #           "birthday": "1991-10-09",
+    #           "age_start": "20",
+    #           "age_end": "25",
+    #           "gender": 1,
+    #           "orientation": 2,
+    #           "age": "22",
+    #           // optional
+    #           "tagline": "Hi."
     #       } 
     # }
 
+    # TODO: add auth
     retval = {
         "success": False, 
         "data": {}, 
@@ -144,53 +147,48 @@ def register_person(request):
     }
     
     if request.method == 'POST':        
-        is_auth = login(request)
-        if is_auth["success"]:
-        
-            person = PersonSerializer(data=request.DATA["person"])
-            person_valid = person.is_valid()
+        person = PersonSerializer(data=request.DATA["person"])
+        person_valid = person.is_valid()
 
-            if person_valid:
-                person = person.object
-                retval = controller.register_person(user, person, retval)
-                retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
-            else:
-                retval["error"] = person.errors
-
+        if person_valid:
+            person = person.object
+            retval = controller.register_person(person, retval)
+            retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
         else:
-            return JSONResponse(retval, status=403)
-
+            retval["error"] = person.errors
     return JSONResponse(retval, status=200)
    
 @csrf_exempt
 @api_view(['POST'])
 def update_person(request):
 
-    # update the profile of someone already in the database
+    # register a new person, their username can't already be in the db
     # MSB: yes I know username and token are in here twice, I'll fix that later
     #      username and token should match in both dicts, but not enforced
+    # MSB: and I say things are optional, but they aren't really right now. sorry.
+    # MSB: I can change it so you don't have to pass in pk for things like orientation, just let me know
     # { "app": 
     #       {
     #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
-    #       }
+    #       },
     #   "user":
     #       {
     #           "username": "mischa",
     #           "token": "bloop"
-    #       }
-    #   "person":    #       {
-    #       // required
+    #       },
+    #   "person":
+    #       {   // required
     #           "username": "mischa",
     #           "token": "bloop",
-    #       // optional
-    #           handle = "mischa",
-    #           tagline = "Hi.",
-    #           birthday = "1991-10-09",
-    #           age_start = "20",
-    #           age_end = "25",
-    #           gender = "Female",
-    #           orientation = ["Male"],
-    #           age = "22",
+    #           // optional
+    #           "handle": "mischa",
+    #           "birthday": "1991-10-09",
+    #           "age_start": "20",
+    #           "age_end": "25",
+    #           "gender": 1,
+    #           "orientation": 2,
+    #           "age": "22",
+    #           "tagline": "Hi."
     #       } 
     # }
 
@@ -204,13 +202,13 @@ def update_person(request):
     if request.method == 'POST':
 
         is_auth = login(request)
-        if is_auth["success"]:
+        if is_auth:
                     
             person = PersonSerializer(data=request.DATA["person"])
             person_valid = person.is_valid()
             if person_valid:
                 person = person.object
-                retval = controller.update_person(user, person, retval)
+                retval = controller.update_person(person, retval)
                 retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
             else:
                 retval["error"] = person.errors
@@ -232,12 +230,12 @@ def get_person(request):
     
     # TODO: clean up login/controller/this method, and include better error handling
     if request.method == 'POST':
-    is_auth = login(request)
-    if is_auth["success"]:
-            username = request.DATA["user"]["username"]
-        
-            retval = controller.get_person(username, retval)
-            retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
+        is_auth = login(request)
+        if is_auth["success"]:
+                username = request.DATA["user"]["username"]
+            
+                retval = controller.get_person(username, retval)
+                retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
         else:
             return JSONResponse(retval, status=403)
     return JSONResponse(retval, status=200)

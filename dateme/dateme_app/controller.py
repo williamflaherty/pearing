@@ -81,7 +81,8 @@ def add_message(user, message, status):
 def register_person(person, status):
     
     status["success"] = False
-    
+    status["data"]["person"] = {}
+
     m = models.Person.objects.filter(username=person.username)
 
     if m:
@@ -98,8 +99,8 @@ def register_person(person, status):
             age_start = person.age_start, 
             age_end = person.age_end, 
             gender = person.gender, 
-            orientation = person.orientation, 
-            age = person.age_end
+            age = person.age_end,
+            orientation = person.orientation
         )
         p.save()
         status["data"]["person"] = p
@@ -107,9 +108,10 @@ def register_person(person, status):
     return status
     
 def update_person(person, status):
-    # TODO: bad thing is that someone could update the token expiration, need to fix that
+    # TODO: make sure the token expiration is masked from the outside
 
     status["success"] = False
+    status["data"]["person"] = {}
     
     m = models.Person.objects.filter(username=person.username)
 
@@ -117,7 +119,9 @@ def update_person(person, status):
         # update the person object in the database
         m = m[0]
         person.pk = m.pk
+        person.token_expiration = m.token_expiration
         person.save()
+        status["data"]["person"] = person
         status["success"] = True
     elif m:
         status["error"] += "More than one person with that username. Cannot update profile."
@@ -148,14 +152,14 @@ def authenticate_user(user, token, status):
         m = m[0]
         if m.token == token and m.token_expiration >= timezone.now():
             status["success"] = True
-        elif m.token == token:
-	    # TODO: this prolly won't be in this method, but for now, if token expired, reauth with instagram
-	    pass
-	    #https://api.instagram.com/v1/users/13863795?access_token=13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f
-    elif m:
-        pass
-    else:
-        pass
+    #     elif m.token == token:
+    # 	    # TODO: this prolly won't be in this method, but for now, if token expired, reauth with instagram
+    # 	    pass
+    # 	    #https://api.instagram.com/v1/users/13863795?access_token=13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f
+    # elif m:
+    #     pass
+    # else:
+    #     pass
 
     return status
 
