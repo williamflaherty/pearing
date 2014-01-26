@@ -78,19 +78,51 @@ def add_message(user, message, status):
 
     return status
 
-def save_person(user, person, status):
+def register_person(person, status):
     
     status["success"] = False
     
-    # update the person object in the database
-    m = models.Person.objects.get(username=user)
-    person.pk = m.pk
+    m = models.Person.objects.filter(username=person.username)
+
+    if m:
+        status["error"] += "That username is taken. Cannot add new user."
+    else:
+        # TODO: need to verify their token and set expiration appropriately
+        p = models.Person(
+            username = person.username, 
+            handle = person.handle, 
+            token = person.token, 
+            token_expiration = timezone.now() + datetime.timedelta(days=1),
+            tagline = person.tagline, 
+            birthday = person.birthday, 
+            age_start = person.age_start, 
+            age_end = person.age_end, 
+            gender = person.gender, 
+            orientation = person.orientation, 
+            age = person.age_end
+        )
+        p.save()
+        status["data"]["person"] = p
+        status["success"] = True
+    return status
     
-    # save person object to the database
-    person.save()
+def update_person(person, status):
+    # TODO: bad thing is that someone could update the token expiration, need to fix that
+
+    status["success"] = False
     
-    # set success
-    status["success"] = True
+    m = models.Person.objects.filter(username=person.username)
+
+    if len(m) == 1:
+        # update the person object in the database
+        m = m[0]
+        person.pk = m.pk
+        person.save()
+        status["success"] = True
+    elif m:
+        status["error"] += "More than one person with that username. Cannot update profile."
+    else:
+        status["error"] += "No user with that username. Cannot update profile"
 
     return status
     

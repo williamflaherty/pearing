@@ -29,12 +29,12 @@ def login(request):
 
     if "user" in request.DATA and "app" in request.DATA:
 
-	if "username" in request.DATA["user"] and "token" in request.DATA["user"] and "key" in request.DATA["app"]:
+        if "username" in request.DATA["user"] and "token" in request.DATA["user"] and "key" in request.DATA["app"]:
 
-	    # TODO: use person serializer with required fields
+            # TODO: use person serializer with required fields
             username = request.DATA["user"]["username"]
-	    token = request.DATA["user"]["token"]
-	    secret_key = request.DATA["app"]["key"]
+            token = request.DATA["user"]["token"]
+            secret_key = request.DATA["app"]["key"]
 
             if secret_key == "qahLbKqZG79E4N9XJV9nfdsj":
                 retval = controller.authenticate_user(username, token, retval) 
@@ -105,25 +105,118 @@ def add_message(request):
 
 @csrf_exempt
 @api_view(['POST'])
-def save_person(request):
-    #JSON example: {"user":{"username":"dcash"}, "person": {"id": 1, "username": "dcash", "handle": "dan", "token": "fake_token", "tagline": "cool guy", "birthday": "1990-06-11T21:44:12Z", "age_start": 20, "age_end": 50, "gender": 1, "orientation": [2]}}
+def register_person(request):
+    
+    # register a new person, their username can't already be in the db
+    # MSB: yes I know username and token are in here twice, I'll fix that later
+    #      username and token should match in both dicts, but not enforced
+    # { "app": 
+    #       {
+    #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
+    #       }
+    #   "user":
+    #       {
+    #           "username": "mischa",
+    #           "token": "bloop"
+    #       }
+    #   "person":
+    #       {
+    #       // required
+    #           "username": "mischa",
+    #           "token": "bloop",
+    #           handle = "mischa",
+    #           birthday = "1991-10-09",
+    #           age_start = "20",
+    #           age_end = "25",
+    #           gender = "Female",
+    #           orientation = ["Male"],
+    #           age = "22",
+    #       // optional
+    #           tagline = "Hi.",
+    #       } 
+    # }
+
     retval = {
-        "success": False,
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
+        "error": ""
+    }
+    
+    if request.method == 'POST':        
+        is_auth = login(request)
+        if is_auth["success"]:
+        
+            person = PersonSerializer(data=request.DATA["person"])
+            person_valid = person.is_valid()
+
+            if person_valid:
+                person = person.object
+                retval = controller.register_person(user, person, retval)
+                retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
+            else:
+                retval["error"] = person.errors
+
+        else:
+            return JSONResponse(retval, status=403)
+
+    return JSONResponse(retval, status=200)
+   
+@csrf_exempt
+@api_view(['POST'])
+def update_person(request):
+
+    # update the profile of someone already in the database
+    # MSB: yes I know username and token are in here twice, I'll fix that later
+    #      username and token should match in both dicts, but not enforced
+    # { "app": 
+    #       {
+    #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
+    #       }
+    #   "user":
+    #       {
+    #           "username": "mischa",
+    #           "token": "bloop"
+    #       }
+    #   "person":    #       {
+    #       // required
+    #           "username": "mischa",
+    #           "token": "bloop",
+    #       // optional
+    #           handle = "mischa",
+    #           tagline = "Hi.",
+    #           birthday = "1991-10-09",
+    #           age_start = "20",
+    #           age_end = "25",
+    #           gender = "Female",
+    #           orientation = ["Male"],
+    #           age = "22",
+    #       } 
+    # }
+
+    retval = {
+        "success": False, 
+        "data": {}, 
+        "exception": "", 
         "error": ""
     }
     
     if request.method == 'POST':
-        user = models.Person.objects.get(username = request.DATA["user"]["username"])
-        
-        person = PersonSerializer(data=request.DATA["person"])
-        
-        person_valid = person.is_valid()
 
-        if person_valid:
-            person = person.object
-            retval = controller.save_person(user, person, retval)
+        is_auth = login(request)
+        if is_auth["success"]:
+                    
+            person = PersonSerializer(data=request.DATA["person"])
+            person_valid = person.is_valid()
+            if person_valid:
+                person = person.object
+                retval = controller.update_person(user, person, retval)
+                retval["data"]["person"] = (PersonSerializer(retval["data"]["person"])).data
+            else:
+                retval["error"] = person.errors
+
         else:
-            retval["error"] = person.errors
+            return JSONResponse(retval, status=403)
 
     return JSONResponse(retval, status=200)
     
@@ -139,8 +232,8 @@ def get_person(request):
     
     # TODO: clean up login/controller/this method, and include better error handling
     if request.method == 'POST':
-	is_auth = login(request)
-	if is_auth["success"]:
+    is_auth = login(request)
+    if is_auth["success"]:
             username = request.DATA["user"]["username"]
         
             retval = controller.get_person(username, retval)
