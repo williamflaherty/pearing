@@ -1,8 +1,4 @@
 from django.db import models
-from django.contrib.auth import get_user_model
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
 
 class Gender(models.Model):
     name = models.CharField(max_length = 20, unique = True)
@@ -11,6 +7,7 @@ class Gender(models.Model):
         return self.name
 
 # TODO: do we need registration statuses?
+# TODO: usernames should be unique
 class Person(models.Model):
     username = models.CharField(max_length = 100)
     handle = models.CharField(max_length = 35)
@@ -24,7 +21,7 @@ class Person(models.Model):
     orientation = models.ForeignKey(Gender, related_name='orientation')
     # orientation = models.ManyToManyField(Gender, related_name='orientation')
     age = models.IntegerField()
-    # TODO: add bisexuality back in later
+    # TODO: add bisexuality back in later--the problem that caused that error is that you (MSB) weren't adding a Gender object but a pk with the .add()
     def __unicode__(self):
         return self.username
 
