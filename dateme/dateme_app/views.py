@@ -84,7 +84,7 @@ def get_person(request):
     #       } 
     # }
 
-    retval = Status()
+    retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
     try:
         if request.method == 'POST':
             is_auth = login(request, retval)
@@ -131,7 +131,7 @@ def register_person(request):
     #       } 
     # }
 
-    retval = Status()
+    retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
 
     try:
         if request.method == 'POST':  
@@ -181,7 +181,7 @@ def update_person(request):
     #       } 
     # }
 
-    retval = Status()
+    retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
    
     try:
         if request.method == 'POST': 
