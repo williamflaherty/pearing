@@ -41,6 +41,7 @@ def login(request, retval):
     Authenticate a user and the API call. Can be used independently or as a helper method.
     """
 
+    retval = Status(success=False, data={}, exceptions=["pre datas if"], errors=[], status_code=403)
     if (
         "person"   in request.DATA           and 
         "username" in request.DATA["person"] and
@@ -54,12 +55,14 @@ def login(request, retval):
         token = request.DATA["person"]["token"]
         secret_key = request.DATA["app"]["key"]
 
+        retval = Status(success=False, data={}, exceptions=["in datas if"], errors=[], status_code=403)
         if secret_key == "qahLbKqZG79E4N9XJV9nfdsj":
+
             retval = controller.authenticate_user(username, token, retval)
         else:
             retval.errors.append("010001")
-
-    return retval.success
+    
+    return retval
 
 # GET
    
@@ -84,11 +87,12 @@ def get_person(request):
     #       } 
     # }
 
-    retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
+    retval = Status(success=False, data={}, exceptions=["not post"], errors=[], status_code=403)
     try:
         if request.method == 'POST':
-            is_auth = login(request, retval)
-            if is_auth:
+            
+            retval = login(request, retval)
+            if retval.success:
                 retval.status_code = 200
                 username = request.DATA["person"]["username"]
                 retval = controller.get_person(username, retval)
