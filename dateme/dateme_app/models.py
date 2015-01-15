@@ -78,7 +78,7 @@ class MessageChallenge(models.Model):
     message = models.ForeignKey(Message)
     picture = models.TextField(blank = True)
     user = models.ForeignKey(Person)
-    isComplete = models.BooleanField()
+    isComplete = models.BooleanField(default = True)
 
     # TODO: this should be included but I'm tired and having a hard time with the serializer
     # class Meta:

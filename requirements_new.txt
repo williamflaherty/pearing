@@ -1,0 +1,8 @@
+Django==1.7.2
+Markdown==2.5.2
+distribute==0.6.34
+django-filter==0.7
+djangorestframework==3.0.3
+postgres==2.1.1
+psycopg2==2.5.1
+wsgiref==0.1.2
