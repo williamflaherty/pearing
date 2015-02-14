@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     url(r'^login/$', views.login, name='login'),
 
     # GET
+    url(r'^get_messages/$', views.get_messages, name='get_messages'),
     url(r'^get_person/$', views.get_person, name='get_person'),
 
     # INSERT/UPDATE
@@ -15,7 +16,6 @@ urlpatterns = patterns('',
 
     # NOT FIXED
  #    url(r'^add_message/$', views.add_message, name='add_message'),
- #    url(r'^get_messages/$', views.get_messages, name='get_messages'),
  #    url(r'^complete_challenge/$', views.complete_challenge, name='complete_challenge'),
  #    url(r'^match/$', views.match, name='match'),
  #    url(r'^get_photos/$', views.get_photos, name='get_photos'),

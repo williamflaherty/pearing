@@ -1,12 +1,12 @@
+import random
+import urllib2
+import json
 #from datetime import date, datetime, time
 import datetime
 from dateme_app import models
 from dateme_app.serializers import *
 # TODO: why are serializers in here?
 from django.utils import timezone
-import random
-import urllib2
-import json
 
 # NOTE: the general principle for now, is to let all the exceptions be caught by try/excepts in VIEWS.PY
 
@@ -171,6 +171,32 @@ def update_person(person, status):
 
     return status
 
+def get_messages(user, status, last_time=None, num_messages=None):
+
+    """
+    Get a person's messages.
+    """
+    # TODO: should last_time variable
+
+    # i think we should separate the status stuff from the backend logic and just handle
+    # exceptions properly, but i'm just going to leave it as-is for now
+    status = get_person(user, status)
+    if status.success:
+        status.success = False
+        person = status.data["person"]
+        messages = models.Message.objects.filter(sender=person).order_by('timestamp')
+        
+        if num_messages:
+            messages = messages[:num_messages]
+        status.data["messages"] = messages
+        status.success = True
+
+    # ugh. since we're passing status around we need to delete the person to avoid breaking the serializer
+    # DC: do we want to include the person data in the response? i would think not, but i'm open to changing
+    del status.data["person"]
+
+    return status
+
 # NOT FIXED
 
 # # shamelessly stolen from http://stackoverflow.com/questions/2217488/age-from-birthdate-in-python/2259711#2259711
@@ -185,20 +211,6 @@ def update_person(person, status):
 #         return today.year - born.year - 1
 #     else:
 #         return today.year - born.year
-
-# def get_messages(user, lastTime, num_messages, status):
-
-#     # TODO: should lastTime variable
-    
-#     status.success = False
-#     messages = models.Message.objects.filter(sender=user).order_by('timestamp')
-    
-#     if num_messages:
-#         messages = messages[:num_messages]
-#     status.data["messages"] = messages
-#     status.success = True
-
-#     return status
 
 # def add_message(user, message, status):
 

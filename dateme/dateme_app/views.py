@@ -207,42 +207,59 @@ def update_person(request):
         retval.exceptions.append(str(e))
 
     return JSONResponse(retval.serialize(), status=retval.status_code)
- 
+
+@csrf_exempt
+@api_view(['POST'])
+def get_messages(request):
+
+    """
+    Get messages for a particular user. Can specify a max number of messages to return and/or a last time.
+    """
+
+    # usage:
+    # { "app": 
+    #       {
+    #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
+    #       },
+    #   "person":
+    #       {   // required
+    #           "username": "williamflaherty",
+    #           "token": "13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f",
+    #       },
+    #   "messages":
+    #       {
+    #           // optional
+    #           "num_messages": "5".
+    #           "last_time": "2015-02-14T07:23:57.071000Z",
+    #       }
+    # }
+
+    retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
+   
+    try:
+        if request.method == 'POST': 
+
+            retval = login(request, retval)
+            if retval.success:
+                retval.status_code = 200
+                username = request.DATA["person"]["username"]
+
+                num_messages = None
+                last_time = None
+                if request.DATA.get("messages"):
+                    num_messages = request.DATA["messages"].get("num_messages")
+                    last_time = request.DATA["messages"].get("last_time")
+
+                retval = controller.get_messages(username, retval, last_time=last_time, num_messages=num_messages)
+                if retval.success:
+                    retval.data["messages"] = [MessageSerializer(msg).data for msg in retval.data["messages"]]
+    except Exception as e:
+        retval.exceptions.append(str(e))
+
+    return JSONResponse(retval.serialize(), status=retval.status_code)
+
+
 # # NOT FIXED
-
-# @csrf_exempt
-# @api_view(['POST'])
-# def get_messages(request):
-#     retval = {
-#         "success": False, 
-#         "data": {}, 
-#         "exception": "", 
-#         "error": ""
-#     }
-
-#     if request.method == 'POST':
-#         # TODO: authenticate the user via the token
-#         user = models.Person.objects.get(username = request.DATA["user"]["username"]) 
-
-#         # these are used for polling and limiting the number of messages, and are optional
-#         num_messages = None     # all messages
-#         last_time = 0           # from the beginning of time
-
-#         if "last_time" in request.DATA:
-#             last_time = request.DATA["last_time"]
-        
-#         if "num_messages" in request.DATA:
-#             num_messages = request.DATA["num_messages"]
-        
-#         # request the last x messages from the last x time
-#         retval = controller.get_messages(user, last_time, num_messages, retval) 
-
-#         # serialize the data back into JSON
-#         retval.data["messages"] = (MessageSerializer(retval.data["messages"])).data
-
-
-#     # return data to Willie
-#     return JSONResponse(retval, status=200)
 
 # @csrf_exempt
 # @api_view(['POST'])
