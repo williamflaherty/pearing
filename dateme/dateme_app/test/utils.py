@@ -9,9 +9,12 @@ def create_fake_gender(gender):
     return g
 
 def create_fake_person(username, gender, orientation, handle=None, token="Fake token", token_expiration=None, tagline="Fake tagline",
-                        birthday="1900-01-01", age_start=18, age_end=50, age=116):
+                        birthday=None, age_start=18, age_end=50, age=116):
     if not handle:
         handle=username
+
+    if not birthday:
+        birthday = datetime.date(1900, 01, 01)
 
     if not token_expiration:
         token_expiration = timezone.now() + datetime.timedelta(days=1)
