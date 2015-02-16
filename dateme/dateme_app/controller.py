@@ -102,6 +102,8 @@ def get_person(user, status):
         status.success = True
     elif m:
         status.errors.append("020002")
+    else:
+        status.errors.append("020202")
 
     return status
 
