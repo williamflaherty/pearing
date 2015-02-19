@@ -38,3 +38,5 @@ nosetests.xml
 *.swp
 
 dateme/dateme/settings.py
+
+*.pyc
