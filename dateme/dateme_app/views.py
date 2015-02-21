@@ -100,6 +100,8 @@ def get_person(request):
                     retval.data["person"] = (PersonSerializer(retval.data["person"])).data
     except Exception as e:
         retval.exceptions.append(str(e))
+        retval.success = False
+        retval.status_code = 500
 
     return JSONResponse(retval.serialize(), status=retval.status_code)
 
@@ -152,6 +154,8 @@ def register_person(request):
                 retval.errors.extend(person.errors)
     except Exception as e:
         retval.exceptions.append(str(e))
+        retval.success = False
+        retval.status_code = 500
 
     return JSONResponse(retval.serialize(), status=retval.status_code)
    
@@ -205,6 +209,8 @@ def update_person(request):
 
     except Exception as e:
         retval.exceptions.append(str(e))
+        retval.success = False
+        retval.status_code = 500
 
     return JSONResponse(retval.serialize(), status=retval.status_code)
  
