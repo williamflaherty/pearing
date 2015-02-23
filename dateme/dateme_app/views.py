@@ -20,7 +20,7 @@ class JSONResponse(HttpResponse):
 
 class Status(object):
     def __init__(self, success=False, data={}, exceptions=[], errors=[], status_code=403):
-        self.success = False
+        self.success = success
         self.data = data
         self.exceptions = exceptions
         self.errors = errors
@@ -90,7 +90,7 @@ def get_person(request):
     retval = Status(success=False, data={}, exceptions=["not post"], errors=[], status_code=403)
     try:
         if request.method == 'POST':
-            
+
             retval = login(request, retval)
             if retval.success:
                 retval.status_code = 200
