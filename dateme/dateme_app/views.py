@@ -142,16 +142,18 @@ def register_person(request):
     try:
         if request.method == 'POST':  
 
-            retval.status_code = 200      
-            person = PersonSerializer(data=request.DATA["person"])
-            person_valid = person.is_valid()
+            retval = login(request, retval)
+            if retval.success:    
+            
+                person = PersonSerializer(data=request.DATA["person"])
+                person_valid = person.is_valid()
 
-            if person_valid:
-                person = person.object
-                retval = controller.register_person(person, retval)
-                retval.data["person"] = (PersonSerializer(retval.data["person"])).data
-            else:
-                retval.errors.extend(person.errors)
+                if person_valid:
+                    person = person.validated_data
+                    retval = controller.register_person(person, retval)
+                    retval.data["person"] = (PersonSerializer(retval.data["person"])).data
+                else:
+                    retval.errors.extend(person.errors)
     except Exception as e:
         retval.exceptions.append(str(e))
         retval.success = False
@@ -201,7 +203,7 @@ def update_person(request):
                 person = PersonSerializer(data=request.DATA["person"])
                 person_valid = person.is_valid()
                 if person_valid:
-                    person = person.object
+                    person = person.validated_data
                     retval = controller.update_person(person, retval)
                     retval.data["person"] = (PersonSerializer(retval.data["person"])).data
                 else:
