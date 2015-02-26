@@ -149,7 +149,7 @@ def register_person(request):
                 person_valid = person.is_valid()
 
                 if person_valid:
-                    person = person.validated_data
+                    person = person.create(person.validated_data)
                     retval = controller.register_person(person, retval)
                     retval.data["person"] = (PersonSerializer(retval.data["person"])).data
                 else:
@@ -203,7 +203,7 @@ def update_person(request):
                 person = PersonSerializer(data=request.DATA["person"])
                 person_valid = person.is_valid()
                 if person_valid:
-                    person = person.validated_data
+                    person = person.create(person.validated_data)
                     retval = controller.update_person(person, retval)
                     retval.data["person"] = (PersonSerializer(retval.data["person"])).data
                 else:
