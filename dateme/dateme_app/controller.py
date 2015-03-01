@@ -124,19 +124,8 @@ def register_person(person, status):
     if m:
         status.errors.append("020101")
     else:
-        p = models.Person(
-            username = person.username, 
-            handle = person.handle, 
-            token = person.token, 
-            token_expiration = timezone.now() + datetime.timedelta(days=1),
-            tagline = person.tagline, 
-            birthday = person.birthday, 
-            age_start = person.age_start, 
-            age_end = person.age_end, 
-            gender = person.gender, 
-            age = person.age_end,
-            orientation = person.orientation
-        )
+        p = person
+        p.token_expiration = timezone.now() + datetime.timedelta(days=1)
         p.save()
         status.data["person"] = p
         status.success = True

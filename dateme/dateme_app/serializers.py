@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.utils import timezone
 from rest_framework import serializers
 from dateme_app import models
 
@@ -36,6 +37,9 @@ class ContentTypeSerializer(serializers.ModelSerializer):
 class PersonSerializer(serializers.ModelSerializer):
     
     # TODO: include settings
+
+    def create(self, validated_data):
+        return models.Person(**validated_data)
 
     class Meta:
         model = models.Person
