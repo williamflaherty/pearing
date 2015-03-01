@@ -144,7 +144,7 @@ def register_person(request):
 
             retval = login(request, retval)
             if retval.success:    
-            
+                retval.status_code = 200
                 person = PersonSerializer(data=request.DATA["person"])
                 person_valid = person.is_valid()
 
