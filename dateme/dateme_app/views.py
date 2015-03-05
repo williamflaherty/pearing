@@ -151,7 +151,8 @@ def register_person(request):
                 if person_valid:
                     person = person.create(person.validated_data)
                     retval = controller.register_person(person, retval)
-                    retval.data["person"] = (PersonSerializer(retval.data["person"])).data
+                    if retval.success:
+                        retval.data["person"] = (PersonSerializer(retval.data["person"])).data
                 else:
                     retval.errors.extend(person.errors)
     except Exception as e:
@@ -205,7 +206,8 @@ def update_person(request):
                 if person_valid:
                     person = person.create(person.validated_data)
                     retval = controller.update_person(person, retval)
-                    retval.data["person"] = (PersonSerializer(retval.data["person"])).data
+                    if retval.success:
+                        retval.data["person"] = (PersonSerializer(retval.data["person"])).data
                 else:
                     retval.errors.extend(person.errors)
 

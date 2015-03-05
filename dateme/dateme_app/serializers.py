@@ -4,23 +4,32 @@ from rest_framework import serializers
 from dateme_app import models
 
 class DynamicFieldsModelSerializer(serializers.ModelSerializer):
+    
     """
-    A ModelSerializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
+    A ModelSerializer that takes additional 'fields' and 'exclude' arguments 
+    that control which fields should be displayed.
     """
 
     def __init__(self, *args, **kwargs):
-        # Don't pass the 'fields' arg up to the superclass
+        # Don't pass the 'fields', 'exclude' args up to the superclass
         fields = kwargs.pop('fields', None)
+        exclude = kwargs.pop('exclude', None)
 
         # Instantiate the superclass normally
         super(DynamicFieldsModelSerializer, self).__init__(*args, **kwargs)
 
         if fields:
-            # Drop any fields that are not specified in the `fields` argument.
+            # Drop any fields that are not specified in the 'fields' argument.
             allowed = set(fields)
             existing = set(self.fields.keys())
             for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+        if exclude:
+            # Drop any fields that are specified in the 'exclude' argument.
+            not_allowed = set(exclude)
+            existing = set(self.fields.keys())
+            for field_name in (existing & not_allowed):
                 self.fields.pop(field_name)
 
 class SettingSerializer(serializers.ModelSerializer):
@@ -34,7 +43,7 @@ class ContentTypeSerializer(serializers.ModelSerializer):
         model = models.ContentType
         fields = ('id', 'name')
 
-class PersonSerializer(serializers.ModelSerializer):
+class PersonSerializer(DynamicFieldsModelSerializer):
     
     # TODO: include settings
 
@@ -43,7 +52,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Person
-        fields = ('id', 'username', 'handle', 'token', 'tagline', 'birthday', 'age_start', 'age_end', 'gender', 'orientation', 'age')
+        exclude = ['token_expiration']
 
 class MessageSerializer(serializers.ModelSerializer):
     

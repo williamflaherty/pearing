@@ -9,7 +9,7 @@ def create_fake_gender(gender):
     return g
 
 def create_fake_person(username, gender, orientation, handle=None, token="Fake token", token_expiration=None, tagline="Fake tagline",
-                        birthday=None, age_start=18, age_end=50, age=116):
+                        birthday=None, age_start=18, age_end=50, age=116, save=True):
     if not handle:
         handle=username
 
@@ -33,7 +33,8 @@ def create_fake_person(username, gender, orientation, handle=None, token="Fake t
         age=age
     )
 
-    p.save()
+    if save:
+        p.save()
     return p
 	
 def create_fake_person_from_json(json):
