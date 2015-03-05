@@ -1,24 +1,32 @@
 import json
 import mock
+import os
 
 from django.core.urlresolvers import reverse
-from rest_framework.renderers import JSONRenderer
 from rest_framework.test import APITestCase
 
 from dateme_app.serializers import *
-from dateme_app.tests.utils import create_fake_gender, create_fake_person
+from dateme_app.tests.utils import *
 from dateme_app.views import Status
 
 class PearingTestCase(APITestCase):
-    def setUp(self):
-        self.gender_male = create_fake_gender("male")
-        self.gender_female = create_fake_gender("female")
 
-        # person saved to test database
-        self.person_a = create_fake_person("Hector", self.gender_male, self.gender_female)
-        
-        # person not saved to test database
-        self.person_b = create_fake_person("Jeremy", self.gender_male, self.gender_female, save=False)
+    fixtures = ['test_cases.json']
+
+    def setUp(self):
+
+        # Load defaults provided by fixtures
+        self.gender_male = load_gender_instance("Male")
+        self.gender_female = load_gender_instance("Female")
+
+        self.person_a = load_person_instance("Hector")
+        self.person_b = load_person_instance("Carlita")
+
+        # Load any custom fixtures. This should probably only be used if saving the fixtures
+        # to the database is undesirable.
+        base_dir = os.path.dirname(os.path.realpath(__file__))
+        instances = create_fake_models_from_fixture(os.path.join(base_dir, '../fixtures', 'john.json'), save=False)
+        self.person_new = instances[0]
 
     def build_data(self, app=True, *args, **kwargs):
         data = {}
@@ -32,7 +40,7 @@ class PearingTestCase(APITestCase):
         return data
 
 class PersonAPITests(PearingTestCase):
-    
+
     """
     Verify that the get_person() view returns a valid 200 response when given a valid request.
     """
@@ -102,17 +110,17 @@ class PersonAPITests(PearingTestCase):
         mock_login.return_value = status
 
         # mock a new person written to the database
-        status = Status(success=True, data={"person":self.person_b}, exceptions=[], errors=[], status_code=200)
+        status = Status(success=True, data={"person":self.person_new}, exceptions=[], errors=[], status_code=200)
         mock_register_person.return_value = status
 
         # Act: call view
         url = reverse('dateme_app:register_person')        
-        request_data = self.build_data(person=PersonSerializer(self.person_b).data)
+        request_data = self.build_data(person=PersonSerializer(self.person_new).data)
         response = self.client.post(url, request_data, format='json')
         response_json = json.loads(response.content)
 
         # Assert: test response
-        response_data = self.build_data(app=False, person=PersonSerializer(self.person_b).data)
+        response_data = self.build_data(app=False, person=PersonSerializer(self.person_new).data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response_json["success"])
         self.assertEqual(response_json["exceptions"], [])
@@ -136,7 +144,7 @@ class PersonAPITests(PearingTestCase):
 
         # Act: call view
         url = reverse('dateme_app:register_person')
-        request_data = self.build_data(person=PersonSerializer(self.person_b).data)
+        request_data = self.build_data(person=PersonSerializer(self.person_new).data)
         response = self.client.post(url, request_data, format='json')
         response_json = json.loads(response.content)
 
@@ -253,7 +261,7 @@ class PersonAPITests(PearingTestCase):
 
         # Act: call view
         url = reverse('dateme_app:update_person')
-        request_data = self.build_data(person=PersonSerializer(self.person_b).data)
+        request_data = self.build_data(person=PersonSerializer(self.person_new).data)
         response = self.client.post(url, request_data, format='json')
         response_json = json.loads(response.content)
 
@@ -264,7 +272,6 @@ class PersonAPITests(PearingTestCase):
         self.assertEqual(response_json["errors"], errors)
         self.assertEqual(response_json["data"], {})
 
-class OtherAPITests(PearingTestCase):
-    
-    # Testing login will go here.
+class ServiceAPITests(PearingTestCase):
+    # TODO: Testing login will go here.    
     pass
