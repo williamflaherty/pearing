@@ -1,0 +1,57 @@
+[
+{
+    "fields": {
+        "name": "Female"
+    },
+    "model": "dateme_app.gender",
+    "pk": 1
+},
+{
+    "fields": {
+        "name": "Male"
+    },
+    "model": "dateme_app.gender",
+    "pk": 2
+},
+{
+    "fields": {
+        "username": "Hector",
+        "gender": 2,
+        "handle": "Hector",
+        "token_expiration": "2016-03-06T04:14:05Z",
+        "tagline": "Hector's brilliant description.",
+        "age": 30,
+        "token": "Fake hector token",
+        "birthday": "1985-03-01",
+        "age_start": 25,
+        "age_end": 35,
+        "orientation": 1
+    },
+    "model": "dateme_app.person",
+    "pk": 1
+},
+{
+    "fields": {
+        "username": "Carlita",
+        "gender": 1,
+        "handle": "Carlita",
+        "token_expiration": "2016-01-05T04:15:29Z",
+        "tagline": "Carlita's amazing description. Pre-med.",
+        "age": 26,
+        "token": "Fake carlita token",
+        "birthday": "1989-02-05",
+        "age_start": 21,
+        "age_end": 31,
+        "orientation": 2
+    },
+    "model": "dateme_app.person",
+    "pk": 2
+},
+{
+    "fields": {
+        "name": "Text"
+    },
+    "model": "dateme_app.contenttype",
+    "pk": 1
+}
+]

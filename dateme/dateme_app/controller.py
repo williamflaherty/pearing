@@ -91,8 +91,8 @@ def get_person(user, status):
     """
     Get a user's general information.
     """
+    
     status.success = False
-    status.data["person"] = {}
 
     # get current person object from database
     m = models.Person.objects.filter(username=user)
@@ -118,7 +118,6 @@ def register_person(person, status):
     """
 
     status.success = False
-    status.data["person"] = {}
 
     m = models.Person.objects.filter(username=person.username)
     if m:
@@ -140,7 +139,6 @@ def update_person(person, status):
     # TODO: make sure the token expiration is masked from the outside in all the return methods...
 
     status.success = False
-    status.data["person"] = {}
 
     m = models.Person.objects.filter(username=person.username)
     if len(m) == 1:
