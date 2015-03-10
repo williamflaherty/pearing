@@ -9,7 +9,7 @@ def get_error_message(status_code):
 		#02XX - Username database violations
 		"0200": "More than one user with this username in the database.",
 		"0201": "The given username is already taken.",
-		"0202": "The given username does not exist in the database",
+		"0202": "The given username does not exist in the database.",
 	}
 
 	code = status_code[:4]

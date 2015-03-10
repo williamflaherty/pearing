@@ -4,6 +4,7 @@ from dateme_app import views
 urlpatterns = patterns('',
     
     # OTHER
+	url(r'^$', views.api_root, name='api_root'),
     url(r'^login/$', views.login, name='login'),
 
     # GET
