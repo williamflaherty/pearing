@@ -1,7 +1,11 @@
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-from rest_framework.renderers import JSONRenderer
+from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.decorators import api_view
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
 from dateme_app import controller
 from dateme_app.serializers import *
 
@@ -33,6 +37,14 @@ class Status(object):
         temp["exceptions"] = self.exceptions
         temp["errors"] = self.errors
         return temp
+
+@api_view(('GET',))
+def api_root(request, format=None):
+    return Response({
+        'get_person': reverse('dateme_app:get_person', request=request, format=format),
+        'register_person': reverse('dateme_app:register_person', request=request, format=format),
+        'update_person': reverse('dateme_app:update_person', request=request, format=format)
+    })
 
 @csrf_exempt
 def login(request, retval):
@@ -71,21 +83,78 @@ def login(request, retval):
 def get_person(request):
 
     """
-    Get a user's general information. If the user does not exist, all fields will be null.
-    If more than one user with that username exists in the database, all fields will be null.
-    """
+    Get a user's general information. If the user does not exist, data will be null.  
+    If more than one user with that username exists in the database, data will be null.  
     
-    # usage:
-    # { "app": 
-    #       {
-    #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
-    #       },
-    #   "person":
-    #       {   
-    #           "username": "williamflaherty",
-    #           "token": "13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f",
-    #       } 
-    # }
+    ### Response
+    Object  
+
+        {
+            "data": 
+            {
+                "person": 
+                {
+                    "id": integer,
+                    "username": string,
+                    "handle": string,
+                    "token": string,
+                    "tagline": string,
+                    "birthday": date,
+                    "age_start": integer,
+                    "age_end": integer,
+                    "age": integer,
+                    "gender": integer,
+                    "orientation": integer
+                    }
+            }
+            "errors": [<string>],
+            "exceptions": [<string>],
+            "success": boolean
+        }
+
+    Status codes  
+    200: OK  
+    403: Unauthorized  
+    500: Unhandled exception  
+
+    Error codes  
+    0100: Unauthorized access to the Pearing API.  
+    0101: This user failed Instagram's authorization.  
+    0200: More than one user with this username in the database.  
+    0201: The given username is already taken.  
+    0202: The given username does not exist in the database.  
+
+    ### Request object 
+
+    Specification
+
+        {
+            "app":  
+            {
+                "key": string  
+            },  
+            "person":  
+            {   
+                "username": string,   
+                "token": string   
+            }  
+        }  
+
+    Example
+
+        { 
+            "app":  
+            {  
+                "key": "qahLbKqZG79E4N9XJV9nfdsj"  
+            },  
+            "person":  
+            {   
+                "username": "williamflaherty",  
+                "token": "13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f"   
+            }   
+        }
+
+    """
 
     retval = Status(success=False, data={}, exceptions=["not post"], errors=[], status_code=403)
     try:
@@ -113,29 +182,92 @@ def register_person(request):
     
     """
     Register a new user along with their general information. The username must not already be in the database.
-    """
 
-    # usage:
-    # MSB: and I say things are optional, but they aren't really right now. sorry (TODO).
-    # { "app": 
-    #       {
-    #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
-    #       },
-    #   "person":
-    #       {   // required
-    #           "username": "williamflaherty",
-    #           "token": "13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f",
-    #           "handle": "mischa",
-    #           "birthday": "1991-10-09",
-    #           "age_start": "20",
-    #           "age_end": "25",
-    #           "gender": 1,
-    #           "orientation": 2,
-    #           "age": "22",
-    #           // optional
-    #           "tagline": "Hi."
-    #       } 
-    # }
+    ### Response
+    Object  
+
+        {
+            "data": 
+            {
+                "person": 
+                {
+                    "id": integer,
+                    "username": string,
+                    "handle": string,
+                    "token": string,
+                    "tagline": string,
+                    "birthday": date,
+                    "age_start": integer,
+                    "age_end": integer,
+                    "age": integer,
+                    "gender": integer,
+                    "orientation": integer
+                }
+            }
+            "errors": [<string>],
+            "exceptions": [<string>],
+            "success": boolean
+        }
+
+    Status codes  
+    200: OK  
+    403: Unauthorized  
+    500: Unhandled exception  
+
+    Error codes  
+    0100: Unauthorized access to the Pearing API.  
+    0101: This user failed Instagram's authorization.  
+    0200: More than one user with this username in the database.  
+    0201: The given username is already taken.  
+    0202: The given username does not exist in the database.  
+
+    ### Request object 
+
+    Specification. Fields with asterisks `*` are optional.
+
+        {
+            "app":  
+            {
+                "key": string  
+            },  
+            "person": 
+            {
+                "id": integer,
+                "username": string,
+                "handle": string,
+                "token": string,
+                "tagline": string,*
+                "birthday": date,
+                "age_start": integer,
+                "age_end": integer,
+                "age": integer,
+                "gender": integer,
+                "orientation": integer
+            }
+        }
+
+    Example
+
+        { 
+            "app": 
+            {
+                "key": "qahLbKqZG79E4N9XJV9nfdsj"
+            },
+            "person":
+            {
+                "username": "llmimimielll",
+                "handle": "mischa",
+                "token": "683953844.1fb234f.459a6f0519c147da9dd29dc53954d7b7",
+                "birthday": "1991-10-09",
+                "age_start": "20",
+                "age_end": "25",
+                "age": "23",
+                "gender": 1,
+                "orientation": 2
+            } 
+        }
+
+    """
 
     retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
 
@@ -167,30 +299,95 @@ def register_person(request):
 def update_person(request):
 
     """
-    Update a person's "profile". This contains general information such as orientation and age.
-    """
+    Update a person's profile.
 
-    # usage:
-    # MSB: and I say things are optional, but they aren't really right now. sorry. (TODO)
-    # { "app": 
-    #       {
-    #           "key": "qahLbKqZG79E4N9XJV9nfdsj"
-    #       },
-    #   "person":
-    #       {   // required
-    #           "username": "williamflaherty",
-    #           "token": "13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f",
-    #           // optional
-    #           "handle": "mischa",
-    #           "birthday": "2014-01-09",
-    #           "age_start": "20",
-    #           "age_end": "25",
-    #           "gender": 1,
-    #           "orientation": 2,
-    #           "age": "22",
-    #           "tagline": "Hi."
-    #       } 
-    # }
+    ### Response
+    Object  
+
+        {
+            "data": 
+            {
+                "person": 
+                {
+                    "id": integer,
+                    "username": string,
+                    "handle": string,
+                    "token": string,
+                    "tagline": string,
+                    "birthday": date,
+                    "age_start": integer,
+                    "age_end": integer,
+                    "age": integer,
+                    "gender": integer,
+                    "orientation": integer
+                }
+            }
+            "errors": [<string>],
+            "exceptions": [<string>],
+            "success": boolean
+        }
+
+    Status codes  
+    200: OK  
+    403: Unauthorized  
+    500: Unhandled exception  
+
+    Error codes  
+    0100: Unauthorized access to the Pearing API.  
+    0101: This user failed Instagram's authorization.  
+    0200: More than one user with this username in the database.  
+    0201: The given username is already taken.  
+    0202: The given username does not exist in the database.  
+
+    ### Request object 
+
+    Specification. Fields with asterisks `*` are optional.
+
+        {
+            "app":  
+            {
+                "key": string  
+            },  
+            "person": 
+            {
+                "id": integer,
+                "username": string,
+                "handle": string,
+                "token": string,
+                "tagline": string,*
+                "birthday": date,
+                "age_start": integer,
+                "age_end": integer,
+                "age": integer,
+                "gender": integer,
+                "orientation": integer
+            }
+        }
+
+    Example
+
+        { 
+            "app": 
+            {
+                "key": "qahLbKqZG79E4N9XJV9nfdsj"
+            },
+            "person":
+            {
+                "username": "williamflaherty",  
+                "handle": "willie",
+                "token": "13863795.1fb234f.44d1de17b2cf43c098af6d3b3fd6735f", 
+                "birthday": "1989-06-18",
+                "age_start": "20",
+                "age_end": "30",
+                "age": "25",
+                "gender": 2,
+                "orientation": 1,
+                "tagline": "Bridge. Chai Shai. Designing. Oh, and Boomer Sooner! I do what I want."
+            } 
+        }
+
+    """
+    # TODO: it shouldn't be a requirement to have all fields sans tagline as required.
 
     retval = Status(success=False, data={}, exceptions=[], errors=[], status_code=403)
    
